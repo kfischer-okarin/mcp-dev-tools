@@ -2,8 +2,8 @@ require_relative "test_helper"
 
 require_relative "../lib/json_schema_class_generator"
 
-class JsonSchemaClassGeneratorTest < Minitest::Test
-  def test_exception_includes_definition_name
+describe JsonSchemaClassGenerator do
+  specify "exception messages contain the definition name" do
     schema = {
       "definitions" => {
         "BadDefinition" => {
@@ -18,10 +18,10 @@ class JsonSchemaClassGeneratorTest < Minitest::Test
     error = assert_raises(StandardError) do
       JsonSchemaClassGenerator.new(schema).generate
     end
-    assert_includes error.message, "BadDefinition"
+    value(error.message).must_include "BadDefinition"
   end
 
-  def test_defines_data_class_with_properties
+  it "defines data class with properties" do
     schema = {
       "definitions" => {
         "ProtocolMessage" => {
@@ -39,10 +39,10 @@ class JsonSchemaClassGeneratorTest < Minitest::Test
       ProtocolMessage = Data.define(:seq, :type)
     RUBY
 
-    assert_includes result, expected
+    value(result).must_include expected
   end
 
-  def test_skips_definitions_without_properties
+  it "skips definitions without properties" do
     schema = {
       "definitions" => {
         "NoProperties" => {}
@@ -51,10 +51,10 @@ class JsonSchemaClassGeneratorTest < Minitest::Test
 
     result = JsonSchemaClassGenerator.new(schema).generate
 
-    refute_includes result, "NoProperties"
+    value(result).wont_include "NoProperties"
   end
 
-  def test_class_definitions_are_separated_by_newlines
+  it "separates class definitions by newlines" do
     schema = {
       "definitions" => {
         "Foo" => {"properties" => {}},
@@ -69,11 +69,11 @@ class JsonSchemaClassGeneratorTest < Minitest::Test
 
       Bar = Data.define()
     RUBY
-    assert_includes result, expected
-    assert_operator result, :end_with?, ")\n", "Expected no additional newline at the end"
+    value(result).must_include expected
+    value(result).must_be :end_with?, ")\n", "Expected no additional newline at the end"
   end
 
-  def test_description_is_added_as_class_comment
+  it "adds description as class comment" do
     schema = {
       "definitions" => {
         "Foo" => {
@@ -94,6 +94,6 @@ class JsonSchemaClassGeneratorTest < Minitest::Test
       Foo = Data.define
     RUBY
 
-    assert_includes result, expected
+    value(result).must_include expected
   end
 end
