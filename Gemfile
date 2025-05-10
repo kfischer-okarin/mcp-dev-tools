@@ -9,4 +9,6 @@ gem "rexml", "~> 3.4"
 
 group :development, :test do
   gem "standard"
+  gem "minitest"
+  gem "minitest-reporters"
 end
