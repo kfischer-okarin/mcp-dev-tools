@@ -1,10 +1,12 @@
+# frozen_string_literal: true
+
 class JsonSchemaClassGenerator
   def initialize(schema)
     @schema = schema
   end
 
   def generate
-    result = ""
+    result = +""
     @schema["definitions"].each do |class_name, class_schema|
       properties = class_schema["properties"].keys
       define_args = properties.map { |prop| ":#{prop}" }.join(", ")
