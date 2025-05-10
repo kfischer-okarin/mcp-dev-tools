@@ -10,7 +10,6 @@ class JsonSchemaClassGenerator
   def generate
     unless @generated
       @schema["definitions"].each.with_index do |(class_name, class_schema), index|
-        next unless class_schema.key?("properties") # TODO: Handle allOf
 
         add_class(class_name, class_schema)
         add_line if index < @schema["definitions"].size - 1
@@ -25,9 +24,10 @@ class JsonSchemaClassGenerator
 
   def add_class(class_name, class_schema)
     add_class_comment(class_schema)
-    properties = class_schema["properties"].keys
+    properties = (class_schema["properties"] || {}).keys
     define_args = properties.map { |prop| ":#{to_snake_case(prop)}" }.join(", ")
-    add_line "#{class_name} = Data.define(#{define_args})"
+    define_call_signature = define_args.empty? ? "" : "(#{define_args})"
+    add_line "#{class_name} = Data.define#{define_call_signature}"
   rescue => e
     # Re-raise the exception with the class name for better debugging
     raise e.class, "#{class_name}: #{e.message}"

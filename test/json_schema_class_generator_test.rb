@@ -91,7 +91,7 @@ describe JsonSchemaClassGenerator do
     )
   end
 
-  it "skips definitions without properties" do
+  it "handles definitions without properties" do
     schema = {
       "definitions" => {
         "NoProperties" => {}
@@ -100,7 +100,9 @@ describe JsonSchemaClassGenerator do
 
     result = JsonSchemaClassGenerator.new(schema).generate
 
-    value(result).wont_include "NoProperties"
+    value(result).must_include_consecutive_lines(
+      "NoProperties = Data.define"
+    )
   end
 
   it "separates class definitions by newlines" do
@@ -114,29 +116,11 @@ describe JsonSchemaClassGenerator do
     result = JsonSchemaClassGenerator.new(schema).generate
 
     value(result).must_include_consecutive_lines(
-      "Foo = Data.define()",
+      "Foo = Data.define",
       "",
-      "Bar = Data.define()"
+      "Bar = Data.define"
     )
-    value(result).must_be :end_with?, ")\n", "Expected no additional newline at the end"
-  end
-
-  it "does not add newlines for skipped definitions" do
-    schema = {
-      "definitions" => {
-        "Foo" => {"properties" => {}},
-        "SkipMe" => {},
-        "Bar" => {"properties" => {}}
-      }
-    }
-
-    result = JsonSchemaClassGenerator.new(schema).generate
-
-    value(result).must_include_consecutive_lines(
-      "Foo = Data.define()",
-      "",
-      "Bar = Data.define()"
-    )
+    value(result).must_be :end_with?, "define\n", "Expected no additional newline at the end"
   end
 
   it "adds description as class comment" do
