@@ -17,11 +17,11 @@ class JsonSchemaClassGenerator
         if class_schema["description"]
           description_lines = class_schema["description"].split("\n")
           description_lines.each do |line|
-            @result << "# #{line}".strip << "\n"
+            add_line "# #{line}".strip
           end
         end
-        @result << "#{class_name} = Data.define(#{define_args})\n"
-        @result << "\n" if index < @schema["definitions"].size - 1
+        add_line "#{class_name} = Data.define(#{define_args})"
+        add_line if index < @schema["definitions"].size - 1
       rescue => e
         # Re-raise the exception with the class name for better debugging
         raise e.class, "#{class_name}: #{e.message}"
@@ -30,5 +30,11 @@ class JsonSchemaClassGenerator
     end
 
     @result
+  end
+
+  private
+
+  def add_line(line = "")
+    @result << line << "\n"
   end
 end
