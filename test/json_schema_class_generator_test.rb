@@ -6,7 +6,9 @@ class JsonSchemaClassGeneratorTest < Minitest::Test
   def test_exception_includes_definition_name
     schema = {
       "definitions" => {
-        "BadDefinition" => {}
+        "BadDefinition" => {
+          "properties" => {}
+        }
       }
     }
     schema["definitions"]["BadDefinition"].define_singleton_method(:[]) do |_|
@@ -40,5 +42,19 @@ class JsonSchemaClassGeneratorTest < Minitest::Test
     RUBY
 
     assert_includes result, expected
+  end
+
+  def test_skips_definitions_without_properties
+    schema = {
+      "definitions" => {
+        "NoProperties" => {
+          "type" => "object"
+        }
+      }
+    }
+
+    result = JsonSchemaClassGenerator.new(schema).generate
+
+    refute_includes result, "NoProperties"
   end
 end

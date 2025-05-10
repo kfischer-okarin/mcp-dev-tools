@@ -8,6 +8,8 @@ class JsonSchemaClassGenerator
   def generate
     result = +""
     @schema["definitions"].each do |class_name, class_schema|
+      next unless class_schema.key?("properties") # TODO: Handle allOf
+
       properties = class_schema["properties"].keys
       define_args = properties.map { |prop| ":#{prop}" }.join(", ")
       result << "#{class_name} = Data.define(#{define_args})\n"
