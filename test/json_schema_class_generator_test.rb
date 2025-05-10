@@ -54,6 +54,25 @@ class JsonSchemaClassGeneratorTest < Minitest::Test
     refute_includes result, "NoProperties"
   end
 
+  def test_class_definitions_are_separated_by_newlines
+    schema = {
+      "definitions" => {
+        "Foo" => {"properties" => {}},
+        "Bar" => {"properties" => {}}
+      }
+    }
+
+    result = JsonSchemaClassGenerator.new(schema).generate
+
+    expected = <<~RUBY.strip
+      Foo = Data.define()
+
+      Bar = Data.define()
+    RUBY
+    assert_includes result, expected
+    assert_operator result, :end_with?, ")\n", "Expected no additional newline at the end"
+  end
+
   def test_description_is_added_as_class_comment
     schema = {
       "definitions" => {
