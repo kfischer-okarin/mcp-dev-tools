@@ -160,4 +160,22 @@ describe JsonSchemaClassGenerator do
       line_starting_with("Foo = Data.define")
     )
   end
+
+  it "converts property names to snake_case in the generated data class" do
+    schema = {
+      "definitions" => {
+        "CamelCaseProps" => {
+          "properties" => {
+            "camelCaseProp" => {},
+            "anotherPropertyName" => {},
+            "already_snake" => {}
+          }
+        }
+      }
+    }
+
+    result = JsonSchemaClassGenerator.new(schema).generate
+
+    value(result).must_include "CamelCaseProps = Data.define(:camel_case_prop, :another_property_name, :already_snake)"
+  end
 end

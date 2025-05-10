@@ -26,11 +26,18 @@ class JsonSchemaClassGenerator
   def add_class(class_name, class_schema)
     add_class_comment(class_schema)
     properties = class_schema["properties"].keys
-    define_args = properties.map { |prop| ":#{prop}" }.join(", ")
+    define_args = properties.map { |prop| ":#{to_snake_case(prop)}" }.join(", ")
     add_line "#{class_name} = Data.define(#{define_args})"
   rescue => e
     # Re-raise the exception with the class name for better debugging
     raise e.class, "#{class_name}: #{e.message}"
+  end
+
+  def to_snake_case(str)
+    str.gsub(/([A-Z]+)([A-Z][a-z])/, '\1_\2')
+       .gsub(/([a-z\d])([A-Z])/, '\1_\2')
+       .tr("- ", "__")
+       .downcase
   end
 
   def add_class_comment(class_schema)
