@@ -34,10 +34,9 @@ class JsonSchemaClassGenerator
   end
 
   def to_snake_case(str)
-    str.gsub(/([A-Z]+)([A-Z][a-z])/, '\1_\2')
-       .gsub(/([a-z\d])([A-Z])/, '\1_\2')
-       .tr("- ", "__")
-       .downcase
+    str.gsub(/([A-Z]+)([A-Z][a-z])/, '\1_\2') # HTTPRequest -> HTTP_Request
+      .gsub(/([a-z\d])([A-Z])/, '\1_\2') # camelCase -> camel_Case
+      .downcase
   end
 
   def add_class_comment(class_schema)
