@@ -7,3 +7,6 @@ run:
 
 format-code +files="":
     bundle exec standardrb --fix {{files}}
+
+generate-classes:
+    bundle exec ruby scripts/generate_dap_classes.rb
