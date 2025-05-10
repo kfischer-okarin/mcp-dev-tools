@@ -10,6 +10,7 @@ class JsonSchemaClassGenerator
   def generate
     unless @generated
       @schema["definitions"].each.with_index do |(class_name, class_schema), index|
+        class_schema = merge_all_of(class_schema["allOf"]) if class_schema.key?("allOf")
 
         add_class(class_name, class_schema)
         add_line if index < @schema["definitions"].size - 1
@@ -21,6 +22,24 @@ class JsonSchemaClassGenerator
   end
 
   private
+
+  def merge_all_of(sub_schemas)
+    result = {
+      "properties" => {}
+    }
+    sub_schemas.each do |sub_schema|
+      if sub_schema.key?("$ref")
+        sub_schema_class_name = sub_schema["$ref"].split("/").last
+        sub_schema = @schema["definitions"][sub_schema_class_name]
+      end
+
+      if sub_schema.key?("properties")
+        result["properties"].merge!(sub_schema["properties"])
+        result["description"] = sub_schema["description"]
+      end
+    end
+    result
+  end
 
   def add_class(class_name, class_schema)
     add_class_comment(class_schema)

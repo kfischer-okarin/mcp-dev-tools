@@ -162,4 +162,34 @@ describe JsonSchemaClassGenerator do
 
     value(result).must_include "CamelCaseProps = Data.define(:camel_case_prop, :another_property_name, :already_snake)"
   end
+
+  it "handles allOf merge with another definition" do
+    schema = {
+      "definitions" => {
+        "Base" => {
+          "properties" => {
+            "baseProp" => {}
+          }
+        },
+        "Merged" => {
+          "allOf" => [
+            {"$ref" => "#/definitions/Base"},
+            {
+              "description" => "Merged properties",
+              "properties" => {
+                "mergedProp" => {}
+              }
+            }
+          ]
+        }
+      }
+    }
+
+    result = JsonSchemaClassGenerator.new(schema).generate
+
+    value(result).must_include_consecutive_lines(
+      "# Merged properties",
+      "Merged = Data.define(:base_prop, :merged_prop)"
+    )
+  end
 end
