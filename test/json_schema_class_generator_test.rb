@@ -121,6 +121,24 @@ describe JsonSchemaClassGenerator do
     value(result).must_be :end_with?, ")\n", "Expected no additional newline at the end"
   end
 
+  it "does not add newlines for skipped definitions" do
+    schema = {
+      "definitions" => {
+        "Foo" => {"properties" => {}},
+        "SkipMe" => {},
+        "Bar" => {"properties" => {}}
+      }
+    }
+
+    result = JsonSchemaClassGenerator.new(schema).generate
+
+    value(result).must_include_consecutive_lines(
+      "Foo = Data.define()",
+      "",
+      "Bar = Data.define()"
+    )
+  end
+
   it "adds description as class comment" do
     schema = {
       "definitions" => {

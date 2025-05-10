@@ -10,6 +10,8 @@ class JsonSchemaClassGenerator
   def generate
     unless @generated
       @schema["definitions"].each.with_index do |(class_name, class_schema), index|
+        next unless class_schema.key?("properties") # TODO: Handle allOf
+
         add_class(class_name, class_schema)
         add_line if index < @schema["definitions"].size - 1
       end
@@ -22,8 +24,6 @@ class JsonSchemaClassGenerator
   private
 
   def add_class(class_name, class_schema)
-    return unless class_schema.key?("properties") # TODO: Handle allOf
-
     add_class_comment(class_schema)
     properties = class_schema["properties"].keys
     define_args = properties.map { |prop| ":#{prop}" }.join(", ")
