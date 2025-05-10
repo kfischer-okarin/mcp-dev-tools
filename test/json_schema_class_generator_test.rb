@@ -57,4 +57,29 @@ class JsonSchemaClassGeneratorTest < Minitest::Test
 
     refute_includes result, "NoProperties"
   end
+
+  def test_description_is_added_as_class_comment
+    schema = {
+      "definitions" => {
+        "Foo" => {
+          "type" => "object",
+          "description" => "A foo object.\n\nYou can use it for bar.",
+          "properties" => {
+            "bar" => {}
+          }
+        }
+      }
+    }
+
+    result = JsonSchemaClassGenerator.new(schema).generate
+
+    expected = <<~RUBY.strip
+      # A foo object.
+      #
+      # You can use it for bar.
+      Foo = Data.define
+    RUBY
+
+    assert_includes result, expected
+  end
 end

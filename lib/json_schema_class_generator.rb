@@ -12,6 +12,12 @@ class JsonSchemaClassGenerator
 
       properties = class_schema["properties"].keys
       define_args = properties.map { |prop| ":#{prop}" }.join(", ")
+      if class_schema["description"]
+        description_lines = class_schema["description"].split("\n")
+        description_lines.each do |line|
+          result << "# #{line}".strip << "\n"
+        end
+      end
       result << "#{class_name} = Data.define(#{define_args})\n"
     rescue => e
       # Re-raise the exception with the class name for better debugging
