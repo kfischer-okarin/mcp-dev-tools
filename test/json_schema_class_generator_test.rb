@@ -25,12 +25,10 @@ class JsonSchemaClassGeneratorTest < Minitest::Test
     schema = {
       "definitions" => {
         "ProtocolMessage" => {
-          "type" => "object",
           "properties" => {
             "seq" => {},
             "type" => {}
-          },
-          "required" => ["seq", "type"]
+          }
         }
       }
     }
@@ -47,9 +45,7 @@ class JsonSchemaClassGeneratorTest < Minitest::Test
   def test_skips_definitions_without_properties
     schema = {
       "definitions" => {
-        "NoProperties" => {
-          "type" => "object"
-        }
+        "NoProperties" => {}
       }
     }
 
@@ -62,7 +58,6 @@ class JsonSchemaClassGeneratorTest < Minitest::Test
     schema = {
       "definitions" => {
         "Foo" => {
-          "type" => "object",
           "description" => "A foo object.\n\nYou can use it for bar.",
           "properties" => {
             "bar" => {}
