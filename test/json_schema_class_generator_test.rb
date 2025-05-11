@@ -13,7 +13,7 @@ require_relative "../lib/json_schema_class_generator"
 # - It only needs to be able to handle the schema at vendor/debug-adapter-protocol/debugAdapterProtocol.json
 # - It should create a value object class using `Data.define` for each definition in the schema.
 # - Each generated data class should have all properties defined in the schema as attributes, the attributes should
-#   be in snake case
+#   be in snake case. Be sure to handle consecutive capital letters correctly: JSONValue -> json_value
 # </spec>
 
 describe JSONSchemaClassGenerator do
@@ -72,6 +72,28 @@ describe JSONSchemaClassGenerator do
 
     # Assert
     value(code).must_match(/Example\s*=\s*Data\.define\(:camel_case_property, :another_property\)/)
+  end
+
+  it "converts consecutive capital letters in property names to snake_case correctly (e.g., JSONValue -> :json_value)" do
+    # Arrange
+    schema = {
+      definitions: {
+        Example: {
+          type: "object",
+          properties: {
+            "JSONValue" => { type: "string" },
+            "HTTPRequest" => { type: "string" }
+          }
+        }
+      }
+    }
+    generator = JSONSchemaClassGenerator.new(schema)
+
+    # Act
+    code = generator.generate
+
+    # Assert
+    value(code).must_match(/Example\s*=\s*Data\.define\(:json_value, :http_request\)/)
   end
 
   it "only needs to handle the schema at vendor/debug-adapter-protocol/debugAdapterProtocol.json" do
