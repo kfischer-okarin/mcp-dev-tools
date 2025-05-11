@@ -1,5 +1,5 @@
-Look at the diff of the <spec> section and update the tests to ensure the new
-specs are fulfilled.
+Look at the #changes of the <spec> section and update the tests to ensure the
+new specs are fulfilled.
 
 ## Coding Style
 
