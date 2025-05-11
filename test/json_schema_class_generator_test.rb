@@ -14,9 +14,42 @@ require_relative "../lib/json_schema_class_generator"
 # - It should create a value object class using `Data.define` for each definition in the schema.
 # - Each generated data class should have all properties defined in the schema as attributes, the attributes should
 #   be in snake case. Be sure to handle consecutive capital letters correctly: JSONValue -> json_value
+# - A definition might be a combination of references to other definitions and own schemas. The generated class should
+#   contain all properties of all referenced definitions as well.
 # </spec>
 
 describe JSONSchemaClassGenerator do
+  it "includes all properties from referenced definitions and own schema in the generated class" do
+    # Arrange
+    schema = {
+      definitions: {
+        Base: {
+          type: "object",
+          properties: {
+            "BaseProperty" => { type: "string" }
+          }
+        },
+        Combined: {
+          allOf: [
+            { "$ref" => "#/definitions/Base" },
+            {
+              type: "object",
+              properties: {
+                "OwnProperty" => { type: "integer" }
+              }
+            }
+          ]
+        }
+      }
+    }
+    generator = JSONSchemaClassGenerator.new(schema)
+
+    # Act
+    code = generator.generate
+
+    # Assert
+    value(code).must_match(/Combined\s*=\s*Data\.define\(:base_property, :own_property\)/)
+  end
   it "can be initialized with a JSON schema loaded with symbol keys" do
     # Arrange
     schema = {title: "Example", type: "object"}

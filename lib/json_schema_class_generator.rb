@@ -7,14 +7,39 @@ class JSONSchemaClassGenerator
 
   def generate
     return "" unless @schema.is_a?(Hash) && @schema[:definitions].is_a?(Hash)
-    @schema[:definitions].map do |name, definition|
-      next unless definition.is_a?(Hash) && definition[:properties].is_a?(Hash)
-      attrs = definition[:properties].keys.map { |k| camel_to_snake(k).to_sym }
+    definitions = @schema[:definitions]
+    definitions.map do |name, definition|
+      all_props = collect_all_properties(definition, definitions)
+      next if all_props.empty?
+      attrs = all_props.keys.map { |k| camel_to_snake(k).to_sym }
       "#{name} = Data.define(#{attrs.map { |a| ":#{a}" }.join(', ')})"
     end.compact.join("\n")
   end
 
   private
+
+  # Recursively collects all properties for a definition, including allOf references
+  def collect_all_properties(definition, definitions)
+    props = {}
+    if definition[:allOf].is_a?(Array)
+      definition[:allOf].each do |item|
+        if item.is_a?(Hash) && item["$ref"]
+          ref = item["$ref"]
+          if ref =~ %r{^#/definitions/(.+)$}
+            ref_name = Regexp.last_match(1).to_sym
+            ref_def = definitions[ref_name]
+            props.merge!(collect_all_properties(ref_def, definitions)) if ref_def
+          end
+        elsif item.is_a?(Hash)
+          props.merge!(collect_all_properties(item, definitions))
+        end
+      end
+    end
+    if definition[:properties].is_a?(Hash)
+      props.merge!(definition[:properties])
+    end
+    props
+  end
 
   # Converts CamelCase or PascalCase to snake_case, handling consecutive capitals correctly
   def camel_to_snake(str)
@@ -22,6 +47,7 @@ class JSONSchemaClassGenerator
       .to_s
       .gsub(/([A-Z]+)([A-Z][a-z])/, '\1_\2')
       .gsub(/([a-z\d])([A-Z])/, '\1_\2')
+      .gsub(/([A-Z]+)([A-Z][a-z])/, '\1_\2') # handle consecutive capitals again
       .downcase
   end
 end
