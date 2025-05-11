@@ -6,7 +6,7 @@ class JSONSchemaClassGenerator
   end
 
   def generate
-    return '' unless @schema.is_a?(Hash) && @schema[:definitions].is_a?(Hash)
+    return "" unless @schema.is_a?(Hash) && @schema[:definitions].is_a?(Hash)
     @schema[:definitions].map do |name, _def|
       "#{name} = Data.define"
     end.join("\n")
