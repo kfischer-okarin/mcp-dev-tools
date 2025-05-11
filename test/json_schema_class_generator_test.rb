@@ -17,11 +17,14 @@ require_relative "../lib/json_schema_class_generator"
 # - A definition might be a combination of references to other definitions and own schemas. The generated class should
 #   contain all properties of all referenced definitions as well.
 # </spec>
+#
+# Test Instructions:
+# - Make sure all test schemas have really symbol keys. Wrap them in TestHelper.deep_symbolize_keys to be sure.
 
 describe JSONSchemaClassGenerator do
   it "includes all properties from referenced definitions and own schema in the generated class" do
     # Arrange
-    schema = {
+    schema = TestHelper.deep_symbolize_keys({
       definitions: {
         Base: {
           type: "object",
@@ -41,7 +44,7 @@ describe JSONSchemaClassGenerator do
           ]
         }
       }
-    }
+    })
     generator = JSONSchemaClassGenerator.new(schema)
 
     # Act
@@ -87,7 +90,7 @@ describe JSONSchemaClassGenerator do
 
   it "includes all properties from the schema as snake_case attributes in the generated class" do
     # Arrange
-    schema = {
+    schema = TestHelper.deep_symbolize_keys({
       definitions: {
         Example: {
           type: "object",
@@ -97,7 +100,7 @@ describe JSONSchemaClassGenerator do
           }
         }
       }
-    }
+    })
     generator = JSONSchemaClassGenerator.new(schema)
 
     # Act
@@ -109,7 +112,7 @@ describe JSONSchemaClassGenerator do
 
   it "converts consecutive capital letters in property names to snake_case correctly (e.g., JSONValue -> :json_value)" do
     # Arrange
-    schema = {
+    schema = TestHelper.deep_symbolize_keys({
       definitions: {
         Example: {
           type: "object",
@@ -119,7 +122,7 @@ describe JSONSchemaClassGenerator do
           }
         }
       }
-    }
+    })
     generator = JSONSchemaClassGenerator.new(schema)
 
     # Act

@@ -18,25 +18,34 @@ class JSONSchemaClassGenerator
 
   private
 
-  # Recursively collects all properties for a definition, including allOf references
+  # Recursively collects all properties for a definition, including allOf references, preserving order and not overwriting existing keys
   def collect_all_properties(definition, definitions)
     props = {}
     if definition[:allOf].is_a?(Array)
       definition[:allOf].each do |item|
-        if item.is_a?(Hash) && item["$ref"]
-          ref = item["$ref"]
+        ref_val = item["$ref"] || item[:$ref] if item.is_a?(Hash)
+        if item.is_a?(Hash) && ref_val
+          ref = ref_val
           if ref =~ %r{^#/definitions/(.+)$}
             ref_name = Regexp.last_match(1).to_sym
             ref_def = definitions[ref_name]
-            props.merge!(collect_all_properties(ref_def, definitions)) if ref_def
+            if ref_def
+              collect_all_properties(ref_def, definitions).each do |k, v|
+                props[k] = v unless props.key?(k)
+              end
+            end
           end
         elsif item.is_a?(Hash)
-          props.merge!(collect_all_properties(item, definitions))
+          collect_all_properties(item, definitions).each do |k, v|
+            props[k] = v unless props.key?(k)
+          end
         end
       end
     end
     if definition[:properties].is_a?(Hash)
-      props.merge!(definition[:properties])
+      definition[:properties].each do |k, v|
+        props[k] = v unless props.key?(k)
+      end
     end
     props
   end
