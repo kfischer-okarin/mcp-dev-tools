@@ -14,30 +14,40 @@ require_relative '../lib/json_schema_class_generator'
 # - It should create a value object class using `Data.define` for each definition in the schema.
 # </spec>
 
-class TestJSONSchemaClassGenerator < Minitest::Test
-  def test_initialize_with_symbol_keys
-    schema = { title: 'Example', type: 'object' }
-    assert JSONSchemaClassGenerator.new(schema)
-  end
 
-  def test_responds_to_generate
+describe JSONSchemaClassGenerator do
+  it 'can be initialized with a JSON schema loaded with symbol keys' do
+    # Arrange
     schema = { title: 'Example', type: 'object' }
+
+    # Act
     generator = JSONSchemaClassGenerator.new(schema)
-    assert_respond_to generator, :generate
+
+    # Assert
+    value(generator).must_be_instance_of JSONSchemaClassGenerator
   end
 
-  def test_generate_returns_string
+  it 'returns Ruby code as a string from #generate' do
+    # Arrange
     schema = { title: 'Example', type: 'object', definitions: {} }
     generator = JSONSchemaClassGenerator.new(schema)
+
+    # Act
     result = generator.generate
-    assert_kind_of String, result
+
+    # Assert
+    value(result).must_be_kind_of String
   end
 
-  def test_generate_includes_data_define_for_protocol_message
-    dap_schema = JSON.load_file(File.expand_path('../vendor/debug-adapter-protocol/debugAdapterProtocol.json', __dir__), symbolize_names: true)
+  it 'creates a Data.define class for each definition in the schema' do
+    # Arrange
+    dap_schema = JSON.load_file(TestHelper.path_relative_from_project_root('vendor/debug-adapter-protocol/debugAdapterProtocol.json'), symbolize_names: true)
     generator = JSONSchemaClassGenerator.new(dap_schema)
+
+    # Act
     code = generator.generate
-    # Should define a Data class for ProtocolMessage
-    assert_match(/ProtocolMessage\s*=\s*Data\.define/, code)
+
+    # Assert
+    value(code).must_match(/ProtocolMessage\s*=\s*Data\.define/)
   end
 end
