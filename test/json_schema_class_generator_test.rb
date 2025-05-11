@@ -12,6 +12,8 @@ require_relative "../lib/json_schema_class_generator"
 # - Generation will be done via a `generate` instance method which should return the generated Ruby code as a string.
 # - It only needs to be able to handle the schema at vendor/debug-adapter-protocol/debugAdapterProtocol.json
 # - It should create a value object class using `Data.define` for each definition in the schema.
+# - Each generated data class should have all properties defined in the schema as attributes, the attributes should
+#   be in snake case
 # </spec>
 
 describe JSONSchemaClassGenerator do
@@ -48,5 +50,39 @@ describe JSONSchemaClassGenerator do
 
     # Assert
     value(code).must_match(/ProtocolMessage\s*=\s*Data\.define/)
+  end
+
+  it "includes all properties from the schema as snake_case attributes in the generated class" do
+    # Arrange
+    schema = {
+      definitions: {
+        Example: {
+          type: "object",
+          properties: {
+            "camelCaseProperty" => { type: "string" },
+            "anotherProperty" => { type: "integer" }
+          }
+        }
+      }
+    }
+    generator = JSONSchemaClassGenerator.new(schema)
+
+    # Act
+    code = generator.generate
+
+    # Assert
+    value(code).must_match(/Example\s*=\s*Data\.define\(:camel_case_property, :another_property\)/)
+  end
+
+  it "only needs to handle the schema at vendor/debug-adapter-protocol/debugAdapterProtocol.json" do
+    # Arrange
+    dap_schema = JSON.load_file(TestHelper.path_relative_from_project_root("vendor/debug-adapter-protocol/debugAdapterProtocol.json"), symbolize_names: true)
+    generator = JSONSchemaClassGenerator.new(dap_schema)
+
+    # Act
+    code = generator.generate
+
+    # Assert
+    value(code).must_be_kind_of String
   end
 end
