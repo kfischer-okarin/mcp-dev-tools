@@ -1,3 +1,1 @@
-- NEVER touch the <spec> section unless I explicitly ask you to.
 - Run a test file via `bundle exec ruby <test_file>`
-- Write at least one test for each specification you cover
