@@ -1,0 +1,1 @@
+- NEVER touch the <spec> section unless I explicitly ask you to.
