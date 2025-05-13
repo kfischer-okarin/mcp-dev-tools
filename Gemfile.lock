@@ -1,3 +1,11 @@
+GIT
+  remote: https://github.com/modelcontextprotocol/ruby-sdk.git
+  revision: 784b8b85481098c15887189ed8e8cfb4c5a67852
+  ref: 784b8b85481098c15887189ed8e8cfb4c5a67852
+  specs:
+    model_context_protocol (0.7.0)
+      json_rpc_handler (~> 0.1)
+
 GEM
   remote: https://rubygems.org/
   specs:
@@ -5,9 +13,9 @@ GEM
     ast (2.4.3)
     builder (3.3.0)
     json (2.10.2)
+    json_rpc_handler (0.1.1)
     language_server-protocol (3.17.0.4)
     lint_roller (1.1.0)
-    mcp-rb (0.3.3)
     minitest (5.25.5)
     minitest-reporters (1.7.1)
       ansi
@@ -63,9 +71,9 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
-  mcp-rb (~> 0.3)
   minitest
   minitest-reporters
+  model_context_protocol!
   rexml (~> 3.4)
   standard
 

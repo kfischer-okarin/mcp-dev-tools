@@ -1,4 +1,6 @@
-require "mcp"
+require "model_context_protocol"
+require "model_context_protocol/transports/stdio"
 
-name "my_mcp_server"
-version "0.0.1"
+server = MCP::Server.new(name: "dev_tools")
+transport = MCP::Transports::StdioTransport.new(server)
+transport.open
