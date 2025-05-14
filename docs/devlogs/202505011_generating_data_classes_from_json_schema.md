@@ -11,3 +11,11 @@
 
 - I chose data classes because they are offered by Ruby directly and seem to be
   a good simple choice for value objects.
+
+## TODO List
+
+- Allow specifying a number of definitions which should not be created as Data
+  classes but rather as empty modules (possibly a hierarchy of modules) since
+  I might want to do type matching or method module inclusion on whole
+  definition hierarchies
+- Allow specifying a parent module under which the classes will be generated
