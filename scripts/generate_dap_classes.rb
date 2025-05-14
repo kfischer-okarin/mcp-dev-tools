@@ -8,6 +8,6 @@ output_path = File.expand_path("../lib/dap.rb", __dir__)
 
 schema = JSON.parse(File.read(schema_path), symbolize_names: true)
 generator = JSONSchemaClassGenerator.new(schema)
-generated_code = generator.generate
+generated_code = generator.generate.strip + "\n" # Ensure there is a single newline at the end
 
 File.write(output_path, generated_code)
