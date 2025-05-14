@@ -12,7 +12,7 @@ class JSONSchemaClassGenerator
       all_props = collect_all_properties(definition, definitions)
       next if all_props.empty?
       attrs = all_props.keys.map { |k| camel_to_snake(k).to_sym }
-      "#{name} = Data.define(#{attrs.map { |a| ":#{a}" }.join(', ')})"
+      "#{name} = Data.define(#{attrs.map { |a| ":#{a}" }.join(", ")})"
     end.compact.join("\n")
   end
 

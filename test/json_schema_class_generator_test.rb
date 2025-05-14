@@ -30,16 +30,16 @@ describe JSONSchemaClassGenerator do
         Base: {
           type: "object",
           properties: {
-            "BaseProperty" => { type: "string" }
+            "BaseProperty" => {type: "string"}
           }
         },
         Combined: {
           allOf: [
-            { "$ref" => "#/definitions/Base" },
+            {"$ref" => "#/definitions/Base"},
             {
               type: "object",
               properties: {
-                "OwnProperty" => { type: "integer" }
+                "OwnProperty" => {type: "integer"}
               }
             }
           ]
@@ -96,8 +96,8 @@ describe JSONSchemaClassGenerator do
         Example: {
           type: "object",
           properties: {
-            "camelCaseProperty" => { type: "string" },
-            "anotherProperty" => { type: "integer" }
+            "camelCaseProperty" => {type: "string"},
+            "anotherProperty" => {type: "integer"}
           }
         }
       }
@@ -118,8 +118,8 @@ describe JSONSchemaClassGenerator do
         Example: {
           type: "object",
           properties: {
-            "JSONValue" => { type: "string" },
-            "HTTPRequest" => { type: "string" }
+            "JSONValue" => {type: "string"},
+            "HTTPRequest" => {type: "string"}
           }
         }
       }
